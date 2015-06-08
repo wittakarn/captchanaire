@@ -1,0 +1,78 @@
+<?php
+session_start();
+require_once '../facebook-php-sdk-v4-4.0-dev/autoload.php';
+require_once '../lib/rb.php';
+require_once '../config.php';
+
+//import required class to the current scope
+use Facebook\FacebookSession;
+use Facebook\FacebookRequest;
+use Facebook\GraphUser;
+use Facebook\FacebookRedirectLoginHelper;
+
+class Login{
+
+	public static $app_id = '791231537640125';  //Facebook App ID
+	public static $app_secret = 'c797f016e385594e8ed1dd53ffdd928f'; //Facebook App Secret
+	public static $required_scope     = 'public_profile, publish_actions, email'; //Permissions required
+    public static $redirect_url       = 'http://localhost/bootstrap/components/login-module.php'; //FB redirects to this page with a code
+	private $helper;
+	private $facebookSession;
+	private $user;
+
+	public function  __construct() {
+		FacebookSession::setDefaultApplication(self::$app_id , self::$app_secret);
+		$this->helper = new FacebookRedirectLoginHelper(self::$redirect_url);
+	}
+
+	function getRedirectUrlFromFacebookLogin() {
+	   $url = $this->helper->getLoginUrl( array( 'scope' => self::$required_scope ) );
+	   //try to get current user session
+		try {
+		  $facebookSession = $this->helper->getSessionFromRedirect();
+		} catch(FacebookRequestException $ex) {
+			die(" Error : " . $ex->getMessage());
+		} catch(\Exception $ex) {
+			die(" Error : " . $ex->getMessage());
+		}
+
+		if ($facebookSession){ //if we have the FB session
+			$url = ROOT;
+		}
+	   return $url;
+	}
+
+	function getFacebookUser() {
+		$user_profile = null;
+		//try to get current user session
+		try {
+		  $facebookSession = $this->helper->getSessionFromRedirect();
+		} catch(FacebookRequestException $ex) {
+			die(" Error : " . $ex->getMessage());
+		} catch(\Exception $ex) {
+			die(" Error : " . $ex->getMessage());
+		}
+
+		if ($facebookSession){ //if we have the FB session
+			$user_profile = (new FacebookRequest($facebookSession, 'GET', '/me'))->execute()->getGraphObject(GraphUser::className())->asArray();
+		}
+	    return $user_profile;
+	}
+
+	function getUser($email){
+		R::setup( 'mysql:host=localhost;dbname=qs1', 'admin', 'admin' ); //for both mysql or mariaDB
+		$this->user = R::findOne( 'user', ' email = :email ', [':email' => $email] );
+		return $this->user;
+	}
+
+	function verifyPassword($password){
+		$iscorrect = false;
+		if($this->user->password == $password){
+			$iscorrect = true;
+		}
+		return $iscorrect;
+	}
+
+}
+
+?>

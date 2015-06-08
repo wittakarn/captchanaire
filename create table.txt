@@ -1,0 +1,42 @@
+# Privileges for `admin`@`localhost`
+
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'localhost' IDENTIFIED BY PASSWORD '*4ACFE3202A5FF5CF467898FC58AAB1D615029441' WITH GRANT OPTION;
+
+GRANT ALL PRIVILEGES ON `admin`.* TO 'admin'@'localhost';
+
+GRANT ALL PRIVILEGES ON `admin\_%`.* TO 'admin'@'localhost';
+
+
+# Privileges for `admin`@`127.0.0.1`
+
+GRANT ALL PRIVILEGES ON *.* TO 'admin'@'127.0.0.1' IDENTIFIED BY PASSWORD '*4ACFE3202A5FF5CF467898FC58AAB1D615029441' WITH GRANT OPTION;
+
+GRANT ALL PRIVILEGES ON `admin`.* TO 'admin'@'127.0.0.1';
+
+GRANT ALL PRIVILEGES ON `admin\_%`.* TO 'admin'@'127.0.0.1';
+
+
+CREATE TABLE qs1.captcha (
+	id int(10) NOT NULL auto_increment,
+	cid int(10) NOT NULL,
+	image_character char(1) NOT NULL,
+	red int(10) NOT NULL,
+	green int(10) NOT NULL,
+	blue int(10) NOT NULL,
+	hex varchar(7) NOT NULL,
+	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE qs1.user (
+	id int(10) NOT NULL auto_increment,
+	email varchar(30) NOT NULL,
+	password varchar(45),
+	login_type char(1) NOT NULL, --N is normal, F is Facebook
+	name varchar(50),
+	sname varchar(100),
+	PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
